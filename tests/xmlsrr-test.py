@@ -80,7 +80,7 @@ class TestInitialization(unittest.TestCase):
     def test_verbose_argument(self):
         arguments = '/tmp/xmlsrr/source/ -v'
         args = xmlsrr.argument_parser(arguments)
-        self.assertEqual(args.v, 1)
+        self.assertEqual(args.verbose, 1)
 
     def test_verbose_argument_long_name(self):
         arguments = '/tmp/xmlsrr/source/ --verbose'
@@ -90,4 +90,4 @@ class TestInitialization(unittest.TestCase):
     def test_verbose_argument_multiple(self):
         arguments = '/tmp/xmlsrr/source -vvvv'
         args = xmlsrr.argument_parser(arguments)
-        self.assertEqual(args.v, 4)
+        self.assertEqual(args.verbose, 4)
