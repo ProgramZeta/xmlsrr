@@ -2,6 +2,7 @@ import unittest
 import sys
 from xmlsrr import xmlsrr
 from io import StringIO
+import os
 
 
 class TestArgumentParser(unittest.TestCase):
@@ -103,12 +104,50 @@ class TestArgumentParser(unittest.TestCase):
         args = xmlsrr.argumentParser(arguments)
         self.assertTrue(args.verify)
 
-class validateTarget(unittest.TestCase):
-    def test_valid_destination(self):
+class TestValidateTarget(unittest.TestCase):
+    def test_destination_valid(self):
+        def fakeOsAccess(targetFolder, test):
+            if test == os.F_OK:
+                return True
+            if test == os.R_OK:
+                return True
+
+        os.access = fakeOsAccess
+
         targetFolder = '/tmp/xmlsrr/source'
         target = xmlsrr.validateTarget(targetFolder)
         self.assertEqual(target, targetFolder)
 
-    def test_invalid_destination(self):
+    def test_destination_invalid(self):
+        def fakeOsAccess(targetFolder, test):
+            if test == os.F_OK:
+                return False
+
+        os.access = fakeOsAccess
+
         targetFolder = '@!$@$!@$!$!@$'
-        self.assertRaises(ValueError, xmlsrr.validateTarget, targetFolder)
+        self.assertRaises(NotADirectoryError, xmlsrr.validateTarget, targetFolder)
+
+    def test_destination_cannot_read(self):
+        def fakeOsAccess(targetFolder, test):
+            if test == os.F_OK:
+                return True
+            if test == os.R_OK:
+                return False
+
+        os.access = fakeOsAccess
+        targetFolder = '/tmp/xmlsrr/source'
+        self.assertRaises(PermissionError, xmlsrr.validateTarget, targetFolder)
+
+    def test_destination_cannot_write(self):
+        def fakeOsAccess(targetFolder, test):
+            if test == os.F_OK:
+                return True
+            if test == os.R_OK:
+                return True
+            if test == os.W_OK:
+                return False
+
+        os.access = fakeOsAccess
+        targetFolder = '/tmp/xmlsrr/source'
+        self.assertRaises(PermissionError, xmlsrr.validateTarget, [targetFolder], False)

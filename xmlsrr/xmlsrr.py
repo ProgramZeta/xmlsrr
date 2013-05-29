@@ -1,4 +1,5 @@
 import argparse
+import os
 
 def main():
     pass
@@ -17,8 +18,20 @@ def argumentParser(arguments):
     parser.add_argument('-V', '--verify', action='store_true')
     return parser.parse_args(args=arguments.split())
 
-def validateTarget(targetFolder):
-    return targetFolder
+def validateTarget(targetFolder, read_only=True):
+    if os.access(targetFolder, os.F_OK):
+        if read_only:
+            if os.access(targetFolder, os.R_OK):
+                return targetFolder
+            else:
+                raise PermissionError
+        else:
+            if os.access(targetFolder, os.W_OK):
+                return targetFolder
+            else:
+                raise PermissionError
+    else:
+        raise NotADirectoryError
 
 if __name__ == '__main__':
     main()
