@@ -52,8 +52,3 @@ contents of the element, but the element and attributes.
 
 Replacement syntax is similar to search syntax, but you can't use a space for the replacement element - you can only
 replace the targeted element with a single replacement element.
-
-###Examples
-*
-*
-*
