@@ -33,5 +33,8 @@ def validateTarget(targetFolder, read_only=True):
     else:
         raise NotADirectoryError
 
+def validateInstructions(instructionsList):
+    pass
+
 if __name__ == '__main__':
     main()

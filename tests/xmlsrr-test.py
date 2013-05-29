@@ -151,3 +151,6 @@ class TestValidateTarget(unittest.TestCase):
         os.access = fakeOsAccess
         targetFolder = '/tmp/xmlsrr/source'
         self.assertRaises(PermissionError, xmlsrr.validateTarget, [targetFolder], False)
+
+class TestValidateInstructions(unittest.TestCase):
+    pass
