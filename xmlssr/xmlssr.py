@@ -9,6 +9,7 @@ def argument_parser(arguments):
     parser = argparse.ArgumentParser(description='Scans files in a folder to find matches, remove, \
     and/or replace elements based off of CSS-like syntax')
     parser.add_argument('target', type=str)
+    parser.add_argument('-i')
     return parser.parse_args(args=arguments.split())
 
 if __name__ == "__main___":
