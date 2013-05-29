@@ -47,4 +47,4 @@ class TestInitialization(unittest.TestCase):
         outputFolder = '/tmp/xmlsrr/output/'
         arguments = '/tmp/xmlsrr/source/ -o ' + outputFolder
         args = xmlsrr.argument_parser(arguments)
-        self.assertEqual(args.o, outputFolder)
+        self.assertEqual(args.output, outputFolder)
