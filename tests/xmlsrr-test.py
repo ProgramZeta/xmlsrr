@@ -42,3 +42,9 @@ class TestInitialization(unittest.TestCase):
         arguments = '-h'
         self.assertRaises(SystemExit, xmlsrr.argument_parser, arguments)
         self.assertRegex(self.output.getvalue(), "usage: xmlsrr")
+
+    def test_output_folder_argument(self):
+        outputFolder = '/tmp/xmlsrr/output/'
+        arguments = '/tmp/xmlsrr/source/ -o' + outputFolder
+        args = xmlsrr.argument_parser(arguments)
+        self.assertEqual(args.o, outputFolder)
