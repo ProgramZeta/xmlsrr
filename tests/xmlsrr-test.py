@@ -101,3 +101,9 @@ class TestArgumentParser(unittest.TestCase):
         arguments = '/tmp/xmlsrr/source --verify'
         args = xmlsrr.argumentParser(arguments)
         self.assertTrue(args.verify)
+
+class TestValidateArguments(unittest.TestCase):
+    def test_validate_target_folder_exists(self):
+        arguments = {}
+        arguments['target'] = '/tmp/xmlsrr/source'
+        xmlsrr.validateArguments(arguments)
