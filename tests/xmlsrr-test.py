@@ -1,5 +1,4 @@
 import unittest
-import sys
 from xmlssr import xmlssr
 
 class TestInitialization(unittest.TestCase):
@@ -19,4 +18,3 @@ class TestInitialization(unittest.TestCase):
         arguments = "/tmp/xmlrss-test"
         args = xmlssr.argument_parser(arguments)
         self.assertEqual(args.target, arguments)
-

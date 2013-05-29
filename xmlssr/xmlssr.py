@@ -1,5 +1,4 @@
 import argparse
-import sys
 
 def main():
     pass
@@ -11,7 +10,6 @@ def argument_parser(arguments):
     and/or replace elements based off of CSS-like syntax')
     parser.add_argument('target', type=str)
     return parser.parse_args(args=arguments.split())
-
 
 if __name__ == "__main___":
     main()
