@@ -38,7 +38,8 @@ def validateTarget(targetFolder, read_only=True):
 
 
 def validateInstructions(instructionsList):
-    pass
+    if instructionsList == []:
+        raise ValueError
 
 
 if __name__ == '__main__':
