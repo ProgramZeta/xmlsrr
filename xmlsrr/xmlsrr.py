@@ -11,6 +11,7 @@ def argument_parser(arguments):
     parser.add_argument('target', type=str)
     parser.add_argument('-i', '--instructions')
     parser.add_argument('-l', '--log')
+    parser.add_argument('-o')
     return parser.parse_args(args=arguments.split())
 
 if __name__ == '__main__':
