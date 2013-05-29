@@ -156,6 +156,10 @@ class TestValidateTarget(unittest.TestCase):
 
 
 class TestValidateInstructions(unittest.TestCase):
-    def test_no_instructions(self):
+    def test_empty_instruction_list(self):
         instructionsList = []
+        self.assertRaises(ValueError, xmlsrr.validateInstructions, instructionsList)
+
+    def test_no_instructions_provided(self):
+        instructionsList = None
         self.assertRaises(ValueError, xmlsrr.validateInstructions, instructionsList)
