@@ -108,3 +108,7 @@ class validateTarget(unittest.TestCase):
         targetFolder = '/tmp/xmlsrr/source'
         target = xmlsrr.validateTarget(targetFolder)
         self.assertEqual(target, targetFolder)
+
+    def test_invalid_destination(self):
+        targetFolder = '@!$@$!@$!$!@$'
+        self.assertRaises(ValueError, xmlsrr.validateTarget, targetFolder)
