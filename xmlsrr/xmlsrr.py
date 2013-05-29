@@ -3,7 +3,7 @@ import argparse
 def main():
     pass
 
-def argument_parser(arguments):
+def argumentParser(arguments):
     if arguments == None or arguments == '':
         raise ValueError('Must provide at least one argument')
     parser = argparse.ArgumentParser(description='Scans files in a folder to find matches, remove, \
