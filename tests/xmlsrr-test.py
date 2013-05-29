@@ -14,27 +14,27 @@ class TestInitialization(unittest.TestCase):
         sys.stdout = self.saved_stdout
 
     def test_help(self):
-        arguments = "-h"
+        arguments = '-h'
         self.assertRaises(SystemExit, xmlsrr.argument_parser, arguments)
 
     def test_no_target_folder(self):
-        arguments = ""
+        arguments = ''
         self.assertRaises(ValueError, xmlsrr.argument_parser, arguments)
 
     def test_target_folder_argument(self):
-        arguments = "/tmp/xmlsrr-test"
+        arguments = '/tmp/xmlsrr-test'
         args = xmlsrr.argument_parser(arguments)
         self.assertEqual(args.target, arguments)
 
     def test_instruction_file_argument(self):
         instructionFile = '/tmp/test-instructions.txt'
-        arguments = "/tmp/xmlsrr-test -i " + instructionFile
+        arguments = '/tmp/xmlsrr-test -i ' + instructionFile
         args = xmlsrr.argument_parser(arguments)
         self.assertEqual(args.instructions, instructionFile)
 
     def test_log_file_argument(self):
         logFile = '/tmp/test-log.log'
-        arguments = '/tmp/xmlsrr-test -l' + logFile
+        arguments = '/tmp/xmlsrr-test -l ' + logFile
         args = xmlsrr.argument_parser(arguments)
         self.assertEqual(args.log, logFile)
 
@@ -45,6 +45,6 @@ class TestInitialization(unittest.TestCase):
 
     def test_output_folder_argument(self):
         outputFolder = '/tmp/xmlsrr/output/'
-        arguments = '/tmp/xmlsrr/source/ -o' + outputFolder
+        arguments = '/tmp/xmlsrr/source/ -o ' + outputFolder
         args = xmlsrr.argument_parser(arguments)
         self.assertEqual(args.o, outputFolder)
