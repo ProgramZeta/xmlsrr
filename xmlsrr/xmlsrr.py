@@ -14,6 +14,7 @@ def argument_parser(arguments):
     parser.add_argument('-o', '--output')
     parser.add_argument('-s', '--silent', action='store_true')
     parser.add_argument('-v', '--verbose', action='count')
+    parser.add_argument('-V', action='store_true')
     return parser.parse_args(args=arguments.split())
 
 if __name__ == '__main__':
