@@ -18,7 +18,7 @@ def argumentParser(arguments):
     return parser.parse_args(args=arguments.split())
 
 def validateTarget(targetFolder):
-    pass
+    return targetFolder
 
 if __name__ == '__main__':
     main()
