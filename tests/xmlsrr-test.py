@@ -91,3 +91,8 @@ class TestInitialization(unittest.TestCase):
         arguments = '/tmp/xmlsrr/source -vvvv'
         args = xmlsrr.argument_parser(arguments)
         self.assertEqual(args.verbose, 4)
+
+    def test_verify_argument(self):
+        arguments = '/tmp/xmlsrr/source -V'
+        args = xmlsrr.argument_parser(arguments)
+        self.assertTrue(args.V)
