@@ -24,3 +24,9 @@ class TestInitialization(unittest.TestCase):
         arguments = "/tmp/xmlrss-test -i " + instructionFile
         args = xmlssr.argument_parser(arguments)
         self.assertEqual(args.i, instructionFile)
+
+    def test_log_file_argument(self):
+        logFile = '/tmp/test-log.log'
+        arguments = '/tmp/xmlrss-test -l' + logFile
+        args = xmlssr.argument_parser(arguments)
+        self.assertEqual(args.l, logFile)
