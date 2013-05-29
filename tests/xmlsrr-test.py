@@ -1,10 +1,17 @@
 import unittest
+import sys
 from xmlssr import xmlssr
+from io import StringIO
 
 class TestInitialization(unittest.TestCase):
-
     def setUp(self):
-        pass
+        self.output = StringIO()
+        self.saved_stdout = sys.stdout
+        sys.stdout = self.output
+
+    def tearDown(self):
+        self.output.close()
+        sys.stdout = self.saved_stdout
 
     def test_help(self):
         arguments = "-h"
@@ -30,3 +37,8 @@ class TestInitialization(unittest.TestCase):
         arguments = '/tmp/xmlrss-test -l' + logFile
         args = xmlssr.argument_parser(arguments)
         self.assertEqual(args.l, logFile)
+
+    def test_help_program_name(self):
+        arguments = '-h'
+        self.assertRaises(SystemExit, xmlssr.argument_parser, arguments)
+        self.assertRegex(self.output.getvalue(), "usage: xmlssr")
