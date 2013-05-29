@@ -30,7 +30,7 @@ class TestInitialization(unittest.TestCase):
         instructionFile = '/tmp/test-instructions.txt'
         arguments = "/tmp/xmlsrr-test -i " + instructionFile
         args = xmlsrr.argument_parser(arguments)
-        self.assertEqual(args.i, instructionFile)
+        self.assertEqual(args.instructions, instructionFile)
 
     def test_log_file_argument(self):
         logFile = '/tmp/test-log.log'
