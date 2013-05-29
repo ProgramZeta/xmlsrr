@@ -156,4 +156,6 @@ class TestValidateTarget(unittest.TestCase):
 
 
 class TestValidateInstructions(unittest.TestCase):
-    pass
+    def test_no_instructions(self):
+        instructionsList = []
+        self.assertRaises(ValueError, xmlsrr.validateInstructions, instructionsList)
