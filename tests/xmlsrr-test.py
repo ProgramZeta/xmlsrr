@@ -36,7 +36,7 @@ class TestInitialization(unittest.TestCase):
         logFile = '/tmp/test-log.log'
         arguments = '/tmp/xmlsrr-test -l' + logFile
         args = xmlsrr.argument_parser(arguments)
-        self.assertEqual(args.l, logFile)
+        self.assertEqual(args.log, logFile)
 
     def test_help_program_name(self):
         arguments = '-h'
