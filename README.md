@@ -9,10 +9,10 @@ lxml
 
 
 ## Usage
-`xmlsrr -h -i [instruction file] -l [log file] -o [output folder] -s -vvvv -V <folder>`
+`xmlsrr -h -i [instruction file] -l [log file] -o [output folder] -s -vvvv -V <target>`
 
 ###Required Parameters
-`<folder>` directory of files to scan
+`<target>` directory of files to scan
 
 ###Optional Parameters
 `-h` displays help
