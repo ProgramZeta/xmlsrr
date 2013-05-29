@@ -52,4 +52,4 @@ class TestInitialization(unittest.TestCase):
     def test_silent_argument(self):
         arguments = '/tmp/xmlsrr/source/ -s'
         args = xmlsrr.argument_parser(arguments)
-        self.assertTrue(args.s)
+        self.assertTrue(args.silent)
