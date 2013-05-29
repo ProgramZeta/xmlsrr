@@ -1,6 +1,6 @@
 import unittest
 import sys
-from xmlssr import xmlssr
+from xmlsrr import xmlsrr
 from io import StringIO
 
 class TestInitialization(unittest.TestCase):
@@ -15,30 +15,30 @@ class TestInitialization(unittest.TestCase):
 
     def test_help(self):
         arguments = "-h"
-        self.assertRaises(SystemExit, xmlssr.argument_parser, arguments)
+        self.assertRaises(SystemExit, xmlsrr.argument_parser, arguments)
 
     def test_no_target_folder(self):
         arguments = ""
-        self.assertRaises(ValueError, xmlssr.argument_parser, arguments)
+        self.assertRaises(ValueError, xmlsrr.argument_parser, arguments)
 
     def test_target_folder_argument(self):
-        arguments = "/tmp/xmlrss-test"
-        args = xmlssr.argument_parser(arguments)
+        arguments = "/tmp/xmlsrr-test"
+        args = xmlsrr.argument_parser(arguments)
         self.assertEqual(args.target, arguments)
 
     def test_instruction_file_argument(self):
         instructionFile = '/tmp/test-instructions.txt'
-        arguments = "/tmp/xmlrss-test -i " + instructionFile
-        args = xmlssr.argument_parser(arguments)
+        arguments = "/tmp/xmlsrr-test -i " + instructionFile
+        args = xmlsrr.argument_parser(arguments)
         self.assertEqual(args.i, instructionFile)
 
     def test_log_file_argument(self):
         logFile = '/tmp/test-log.log'
-        arguments = '/tmp/xmlrss-test -l' + logFile
-        args = xmlssr.argument_parser(arguments)
+        arguments = '/tmp/xmlsrr-test -l' + logFile
+        args = xmlsrr.argument_parser(arguments)
         self.assertEqual(args.l, logFile)
 
     def test_help_program_name(self):
         arguments = '-h'
-        self.assertRaises(SystemExit, xmlssr.argument_parser, arguments)
-        self.assertRegex(self.output.getvalue(), "usage: xmlssr")
+        self.assertRaises(SystemExit, xmlsrr.argument_parser, arguments)
+        self.assertRegex(self.output.getvalue(), "usage: xmlsrr")
