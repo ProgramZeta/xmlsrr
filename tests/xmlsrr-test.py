@@ -3,6 +3,7 @@ import sys
 from xmlsrr import xmlsrr
 from io import StringIO
 
+
 class TestArgumentParser(unittest.TestCase):
     def setUp(self):
         self.output = StringIO()
@@ -102,8 +103,8 @@ class TestArgumentParser(unittest.TestCase):
         args = xmlsrr.argumentParser(arguments)
         self.assertTrue(args.verify)
 
-class TestValidateArguments(unittest.TestCase):
-    def test_validate_target_folder_exists(self):
-        arguments = {}
-        arguments['target'] = '/tmp/xmlsrr/source'
-        xmlsrr.validateArguments(arguments)
+class validateTarget(unittest.TestCase):
+    def test_valid_destination(self):
+        targetFolder = '/tmp/xmlsrr/source'
+        target = xmlsrr.validateTarget(targetFolder)
+        self.assertEqual(target, targetFolder)
