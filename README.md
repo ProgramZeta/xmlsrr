@@ -2,11 +2,7 @@
 Scans files in a folder to find matches, remove, and/or replace elements based off of CSS-like syntax
 
 ## Requirements
-Python 3.2
-lxml
-
-## Setup
-
+Python 3.3
 
 ## Usage
 `xmlsrr -h -i [instruction file] -l [log file] -o [output folder] -s -vvvv -V <target>`
