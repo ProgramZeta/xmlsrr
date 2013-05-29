@@ -1,4 +1,5 @@
 import unittest
+import sys
 from xmlssr import xmlssr
 
 class TestInitialization(unittest.TestCase):
@@ -8,9 +9,14 @@ class TestInitialization(unittest.TestCase):
 
     def test_help(self):
         arguments = "-h"
+        self.assertRaises(SystemExit, xmlssr.argument_parser, arguments)
 
-    def test_no_output_folder(self):
+    def test_no_target_folder(self):
         arguments = ""
+        self.assertRaises(ValueError, xmlssr.argument_parser, arguments)
 
-    def test_output_folder(self):
-        arguments ="tmp"
+    def test_target_folder_argument(self):
+        arguments = "/tmp/xmlrss-test"
+        args = xmlssr.argument_parser(arguments)
+        self.assertEqual(args.target, arguments)
+
