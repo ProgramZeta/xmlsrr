@@ -1,8 +1,10 @@
 import argparse
 import os
 
+
 def main():
     pass
+
 
 def argumentParser(arguments):
     if arguments == None or arguments == '':
@@ -17,6 +19,7 @@ def argumentParser(arguments):
     parser.add_argument('-v', '--verbose', action='count')
     parser.add_argument('-V', '--verify', action='store_true')
     return parser.parse_args(args=arguments.split())
+
 
 def validateTarget(targetFolder, read_only=True):
     if os.access(targetFolder, os.F_OK):
@@ -33,8 +36,10 @@ def validateTarget(targetFolder, read_only=True):
     else:
         raise NotADirectoryError
 
+
 def validateInstructions(instructionsList):
     pass
+
 
 if __name__ == '__main__':
     main()

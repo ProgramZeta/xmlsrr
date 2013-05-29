@@ -1,8 +1,9 @@
 import unittest
 import sys
-from xmlsrr import xmlsrr
 from io import StringIO
 import os
+
+from xmlsrr import xmlsrr
 
 
 class TestArgumentParser(unittest.TestCase):
@@ -104,6 +105,7 @@ class TestArgumentParser(unittest.TestCase):
         args = xmlsrr.argumentParser(arguments)
         self.assertTrue(args.verify)
 
+
 class TestValidateTarget(unittest.TestCase):
     def test_destination_valid(self):
         def fakeOsAccess(targetFolder, test):
@@ -151,6 +153,7 @@ class TestValidateTarget(unittest.TestCase):
         os.access = fakeOsAccess
         targetFolder = '/tmp/xmlsrr/source'
         self.assertRaises(PermissionError, xmlsrr.validateTarget, [targetFolder], False)
+
 
 class TestValidateInstructions(unittest.TestCase):
     pass
