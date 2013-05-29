@@ -48,3 +48,8 @@ class TestInitialization(unittest.TestCase):
         arguments = '/tmp/xmlsrr/source/ -o ' + outputFolder
         args = xmlsrr.argument_parser(arguments)
         self.assertEqual(args.output, outputFolder)
+
+    def test_silent_argument(self):
+        arguments = '/tmp/xmlsrr/source/ -s'
+        args = xmlsrr.argument_parser(arguments)
+        self.assertTrue(args.s)
