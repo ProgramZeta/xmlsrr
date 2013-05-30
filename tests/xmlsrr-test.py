@@ -171,8 +171,7 @@ class TestValidateInstructions(unittest.TestCase):
 
     def test_single_instruction_empty(self):
         instructionsList = ['']
-        instructions = xmlsrr.validateInstructions(instructionsList)
-        self.assertEqual(instructions, [])
+        self.assertRaises(ValueError, xmlsrr.validateInstructions, instructionsList)
 
     def test_multiple_instructions(self):
         instructionsList = ['body', 'p']

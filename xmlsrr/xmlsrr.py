@@ -46,6 +46,8 @@ def validateInstructions(instructionsList):
             pass
         else:
             instructions.append(instruction)
+    if instructions == []:
+        raise ValueError
     return instructions
 
 if __name__ == '__main__':
