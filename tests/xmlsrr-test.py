@@ -163,3 +163,8 @@ class TestValidateInstructions(unittest.TestCase):
     def test_no_instructions_provided(self):
         instructionsList = None
         self.assertRaises(ValueError, xmlsrr.validateInstructions, instructionsList)
+
+    def test_single_instruction(self):
+        instructionsList = ['body']
+        instructions = xmlsrr.validateInstructions(instructionsList)
+        self.assertEqual(instructions, instructionsList)
