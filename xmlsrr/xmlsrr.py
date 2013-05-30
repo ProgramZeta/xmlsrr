@@ -38,9 +38,15 @@ def validateTarget(targetFolder, read_only=True):
 
 
 def validateInstructions(instructionsList):
+    instructions = []
     if instructionsList == [] or instructionsList == None:
         raise ValueError
-    return instructionsList
+    for instruction in instructionsList:
+        if instruction == '':
+            pass
+        else:
+            instructions.append(instruction)
+    return instructions
 
 if __name__ == '__main__':
     main()
