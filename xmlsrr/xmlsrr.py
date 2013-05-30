@@ -40,7 +40,7 @@ def validateTarget(targetFolder, read_only=True):
 def validateInstructions(instructionsList):
     if instructionsList == [] or instructionsList == None:
         raise ValueError
-
+    return instructionsList
 
 if __name__ == '__main__':
     main()
