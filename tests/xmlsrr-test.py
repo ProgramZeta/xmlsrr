@@ -168,3 +168,8 @@ class TestValidateInstructions(unittest.TestCase):
         instructionsList = ['body']
         instructions = xmlsrr.validateInstructions(instructionsList)
         self.assertEqual(instructions, instructionsList)
+
+    def test_multiple_instructions(self):
+        instructionsList = ['body', 'p']
+        instructions = xmlsrr.validateInstructions(instructionsList)
+        self.assertEqual(instructions, instructionsList)
