@@ -182,3 +182,7 @@ class TestValidateInstructions(unittest.TestCase):
         instructionsList = ['', 'body']
         instructions = xmlsrr.validateInstructions(instructionsList)
         self.assertEqual(instructions, ['body'])
+
+    def test_multiple_instructions_all_empty(self):
+        instructionsList = ['','']
+        self.assertRaises(ValueError, xmlsrr.validateInstructions, instructionsList)
