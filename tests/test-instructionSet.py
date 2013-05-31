@@ -34,21 +34,67 @@ class TestDeterminePattern(unittest.TestCase):
         instruction = 'html'
         match = instructionSet.determinePattern(instruction)
         self.assertEqual(match['elements'][0], instruction)
-        self.assertEqual(len(match['classes']), 0)
+        self.assertEqual(match['classes'], None)
         self.assertEqual(match['subMatch'], None)
 
     def test_single_class(self):
         instruction = '.class'
         match = instructionSet.determinePattern(instruction)
         self.assertEqual(match['classes'][0], 'class')
-        self.assertEqual(len(match['elements']), 0)
+        self.assertEqual(match['elements'], None)
 
     def test_multiple_elements(self):
         instruction = 'html body'
         match = instructionSet.determinePattern(instruction)
         self.assertEqual(match['elements'][0], 'html')
-        self.assertEqual(len(match['classes']), 0)
+        self.assertEqual(match['classes'], None)
         self.assertEqual(match['subMatch']['elements'][0], 'body')
+
+    def test_three_elements(self):
+        instruction = 'html body div'
+        match = instructionSet.determinePattern(instruction)
+        self.assertEqual(match['elements'][0], 'html')
+        self.assertEqual(match['classes'], None)
+        self.assertEqual(len(match['subMatch']['elements']), 1)
+        self.assertEqual(match['subMatch']['elements'][0], 'body')
+        self.assertEqual(match['subMatch']['classes'], None)
+        self.assertEqual(match['subMatch']['subMatch']['elements'][0], 'div')
+        self.assertEqual(match['subMatch']['subMatch']['classes'], None)
+
+    def test_multiple_separate_classes(self):
+        instruction = '.red .blue'
+        match = instructionSet.determinePattern(instruction)
+        self.assertEqual(match['elements'], None)
+        self.assertEqual(match['classes'][0], 'red')
+        self.assertEqual(match['subMatch']['elements'], None)
+        self.assertEqual(match['subMatch']['classes'][0], 'blue')
+        self.assertEqual(match['subMatch']['subMatch'], None)
+
+    def test_multiple_conjoined_classes(self):
+        instruction = '.red.blue'
+        match = instructionSet.determinePattern(instruction)
+        self.assertEqual(match['elements'], None)
+        self.assertEqual('red', match['classes'][0])
+        self.assertEqual('blue', match['classes'][1])
+        self.assertEqual(None, match['subMatch'])
+
+    def test_element_multiple_conjoined_classes(self):
+        instruction = 'p.red.blue'
+        match = instructionSet.determinePattern(instruction)
+        self.assertEqual(1, len(match['elements']))
+        self.assertEqual('p', match['elements'][0])
+        self.assertEqual(2, len(match['classes']))
+        self.assertEqual('red', match['classes'][0])
+        self.assertEqual('blue', match['classes'][1])
+        self.assertEqual(None, match['subMatch'])
+
+    def test_element_with_class(self):
+        instruction = 'p.blue'
+        match = instructionSet.determinePattern(instruction)
+        self.assertEqual('p', match['elements'][0])
+        self.assertEqual('blue', match['classes'][0])
+        self.assertEqual(None, match['subMatch'])
+
 
 class TestDetermineReplacement(unittest.TestCase):
     def test_single_replace(self):

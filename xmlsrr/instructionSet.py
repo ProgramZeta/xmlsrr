@@ -41,15 +41,28 @@ def determinePattern(instruction):
     if instruction.strip() == '':
         raise ValueError("Pattern does not contain any values")
     match = {}
-    if instruction.find('.') >= 0:
-        match['classes'] = [instruction[1:]]
-        match['elements'] = []
+    if len(instruction.split(' ')) > 1:
+        match = determinePattern(instruction.split(' ', 1)[0])
+        match['subMatch'] = determinePattern(instruction.split(' ', 1)[1])
     else:
-        if len(instruction.split(' ')) > 1:
-            match['elements'] = [instruction.split(' ')[0]]
-            match['subMatch'] = determinePattern(instruction.split(' ')[1])
+        if instruction.find('.') >= 0:
+            # Class in instruction
+            if instruction[0] == '.':
+                # Class is first instruction
+                if instruction.count('.') == 1:
+                    # Only one class
+                    match['classes'] = [instruction[1:]]
+                else:
+                    # Multiple classes
+                    match['classes'] = instruction[1:].split('.')
+                match['elements'] = None
+            else:
+                match['elements'] = [instruction.split('.')[0]]
+                match['classes'] = instruction.split('.')[1:]
         else:
+            match['classes'] = None
             match['elements'] = [instruction]
-            match['subMatch'] = None
-        match['classes'] = []
+
+        match['subMatch'] = None
+
     return match
