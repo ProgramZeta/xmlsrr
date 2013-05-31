@@ -35,6 +35,8 @@ def determineType(instruction):
 def determineReplacement(instruction):
     if len(instruction.split('->')) != 2:
         raise ValueError("Only one replacement per instruction")
+    if len(instruction.split('->')[1].split(' ')) > 1:
+        raise ValueError("Replacement can only specify one match")
     search, replace = instruction.split('->')
     searchInstruction = determinePattern(search)
     replaceInstruction = determinePattern(replace)
