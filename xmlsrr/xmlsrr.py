@@ -7,7 +7,7 @@ def main():
 
 
 def argumentParser(arguments):
-    if arguments == None or arguments == '':
+    if arguments is None or arguments == '':
         raise ValueError('Must provide at least one argument')
     parser = argparse.ArgumentParser(description='Scans files in a folder to find matches, remove, \
     and/or replace elements based off of CSS-like syntax', prog='xmlsrr')
@@ -39,14 +39,14 @@ def validateTarget(targetFolder, read_only=True):
 
 def validateInstructions(instructionsList):
     instructions = []
-    if instructionsList == [] or instructionsList == None:
+    if instructionsList == [] or instructionsList is None:
         raise ValueError
     for instruction in instructionsList:
         if instruction == '':
             pass
         else:
             instructions.append(instruction)
-    if instructions == []:
+    if not instructions:
         raise ValueError
     return instructions
 

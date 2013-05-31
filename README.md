@@ -29,6 +29,8 @@ Unless specified otherwise, any matches are output to stdout
 * `[foo]` will match any element with a 'foo' attribute
 * `[foo=bar]` will match an element with a 'foo' attribute set to 'bar'
 * `foo bar` will match any 'bar' element that is a descendant of 'foo'
+* `\r\n` (line breaks) will create different selector matches
+* `,` will separate between multiple selectors on the same line
 
 You can mix and match these (like CSS selectors)
 
