@@ -21,6 +21,15 @@ class TestDetermineType(unittest.TestCase):
         instruction = '/p.red -> p.blue'
         self.assertRaises(ValueError, instructionSet.determineType, instruction)
 
+class TestDeterminePattern(unittest.TestCase):
+    def test_empty_pattern(self):
+        instruction = ''
+        self.assertRaises(ValueError, instructionSet.determinePattern, instruction)
+
+    def test_single_space_pattern(self):
+        instruction = ' '
+        self.assertRaises(ValueError, instructionSet.determinePattern, instruction)
+
 class TestDetermineReplacement(unittest.TestCase):
     def test_single_replace(self):
         instruction = 'p.red -> p.blue'

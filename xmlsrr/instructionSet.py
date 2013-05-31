@@ -43,7 +43,9 @@ def determineReplacement(instruction):
 
 
 def determinePattern(instruction):
-    pass
+    if instruction.strip() == '':
+        raise ValueError("Pattern does not contain any values")
+
 
 def determineMultipleInstructions(instruction):
     pass
