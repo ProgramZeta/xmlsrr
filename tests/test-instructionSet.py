@@ -99,6 +99,15 @@ class TestDeterminePattern(unittest.TestCase):
 class TestDetermineReplacement(unittest.TestCase):
     def test_single_replace(self):
         instruction = 'p.red -> p.blue'
+        search, replace = instructionSet.determineReplacement(instruction)
+        self.assertEqual(1, len(search['elements']))
+        self.assertEqual(search['elements'][0], 'p')
+        self.assertEqual(1, len(search['classes']))
+        self.assertEqual(search['classes'][0], 'red')
+        self.assertEqual(1, len(replace['elements']))
+        self.assertEqual(replace['elements'][0], 'p')
+        self.assertEqual(1, len(replace['classes']))
+        self.assertEqual(replace['classes'][0], 'blue')
 
     def test_multiple_replace(self):
         instruction = 'p.red -> p.blue -> p.green'
