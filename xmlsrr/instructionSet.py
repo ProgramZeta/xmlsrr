@@ -4,11 +4,6 @@ class InstructionSet(object):
             self.parseInstruction(instruction)
 
     def parseInstruction(self, instruction):
-        """
-        * determine if we have a removal: check first character for '/'
-        * determine if we have a replacement: separate on '->'
-        * separate on commas to break apart multiple selectors
-        """
         self.mode = determineType(instruction)
 
 
@@ -45,19 +40,16 @@ def determineReplacement(instruction):
 def determinePattern(instruction):
     if instruction.strip() == '':
         raise ValueError("Pattern does not contain any values")
-
-
-def determineMultipleInstructions(instruction):
-    pass
-
-def determineElements(instruction):
-    pass
-
-def determineClasses(instruction):
-    pass
-
-def determineIds(instruction):
-    pass
-
-def determineAttributes(instruction):
-    pass
+    match = {}
+    if instruction.find('.') >= 0:
+        match['classes'] = [instruction[1:]]
+        match['elements'] = []
+    else:
+        if len(instruction.split(' ')) > 1:
+            match['elements'] = [instruction.split(' ')[0]]
+            match['subMatch'] = determinePattern(instruction.split(' ')[1])
+        else:
+            match['elements'] = [instruction]
+            match['subMatch'] = None
+        match['classes'] = []
+    return match

@@ -30,6 +30,25 @@ class TestDeterminePattern(unittest.TestCase):
         instruction = ' '
         self.assertRaises(ValueError, instructionSet.determinePattern, instruction)
 
+    def test_single_element(self):
+        instruction = 'html'
+        match = instructionSet.determinePattern(instruction)
+        self.assertEqual(match['elements'][0], instruction)
+        self.assertEqual(len(match['classes']), 0)
+        self.assertEqual(match['subMatch'], None)
+
+    def test_single_class(self):
+        instruction = '.class'
+        match = instructionSet.determinePattern(instruction)
+        self.assertEqual(match['classes'][0], 'class')
+        self.assertEqual(len(match['elements']), 0)
+
+    def test_multiple_elements(self):
+        instruction = 'html body'
+        match = instructionSet.determinePattern(instruction)
+        self.assertEqual(match['elements'][0], 'html')
+        self.assertEqual(match['subMatch']['elements'][0], 'body')
+
 class TestDetermineReplacement(unittest.TestCase):
     def test_single_replace(self):
         instruction = 'p.red -> p.blue'
