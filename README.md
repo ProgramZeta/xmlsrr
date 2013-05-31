@@ -48,5 +48,4 @@ are completely removed from the source file.
 To replace an element, use `->` to specify what the element should be replaced with. Note that this does not change the
 contents of the element, but the element and attributes.
 
-Replacement syntax is similar to search syntax, but you can't use a space for the replacement element - you can only
-replace the targeted element with a single replacement element.
+Replacement syntax is similar to search syntax, but you can't specify multiple elements in the replacement.
