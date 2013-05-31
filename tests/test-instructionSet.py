@@ -47,6 +47,7 @@ class TestDeterminePattern(unittest.TestCase):
         instruction = 'html body'
         match = instructionSet.determinePattern(instruction)
         self.assertEqual(match['elements'][0], 'html')
+        self.assertEqual(len(match['classes']), 0)
         self.assertEqual(match['subMatch']['elements'][0], 'body')
 
 class TestDetermineReplacement(unittest.TestCase):
