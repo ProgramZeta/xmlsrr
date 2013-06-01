@@ -44,27 +44,78 @@ def determinePattern(instruction):
     else:
         instruction = instruction.strip()
     match = {}
+    match['elements'] = []
+    match['classes'] = []
+    match['ids'] = []
+    match['attributes'] = []
+    match['subMatch'] = None
     if len(instruction.split(' ')) > 1:
         match = determinePattern(instruction.split(' ', 1)[0])
         match['subMatch'] = determinePattern(instruction.split(' ', 1)[1])
     else:
-        if instruction.find('.') >= 0:
-            # Class in instruction
-            if instruction[0] == '.':
-                # Class is first instruction
-                if instruction.count('.') == 1:
-                    # Only one class
-                    match['classes'] = [instruction[1:]]
+        currentType = 'element'
+        currentName = ''
+        currentAttribute = ''
+        for c in instruction:
+            if c in '.#[=]':
+                if currentName != '':
+                    if currentType == 'element':
+                        match['elements'].append(currentName)
+                    elif currentType == 'class':
+                        match['classes'].append(currentName)
+                    elif currentType == 'id':
+                        match['ids'].append(currentName)
+                    elif currentType == 'attributeName':
+                        match['attributes'] = {currentName : ''}
+                        currentAttribute = currentName
+                    elif currentType == 'attributeValue':
+                        if currentAttribute != '':
+                            match['attributes'][currentAttribute] = currentName
+                        else:
+                            raise ValueError('Attribute value set before attribute name')
+                    currentName = ''
+
+                if c == '.':
+                    currentType = 'class'
+                elif c == '#':
+                    currentType = 'id'
+                elif c == '[':
+                    currentType = 'attributeName'
                 else:
-                    # Multiple classes
-                    match['classes'] = instruction[1:].split('.')
-                match['elements'] = None
+                    if currentType == 'attributeName' or currentType == 'attributeValue':
+                        if c == ']':
+                            pass
+                        elif c == '=':
+                            currentType = 'attributeValue'
             else:
-                match['elements'] = [instruction.split('.')[0]]
-                match['classes'] = instruction.split('.')[1:]
-        else:
+                currentName = currentName + c
+
+        if currentName != '':
+            if currentType == 'element':
+                match['elements'].append(currentName)
+            elif currentType == 'class':
+                match['classes'].append(currentName)
+            elif currentType == 'id':
+                match['ids'].append(currentName)
+            elif currentType == 'attributeName':
+                match['attributes'] = {currentName : ''}
+            elif currentType == 'attributeValue':
+                if currentAttribute != '':
+                    match['attributes'][currentAttribute] = currentName
+                else:
+                    raise ValueError('Attribute value set before attribute name')
+
+        if match['elements'] == []:
+            match['elements'] = None
+
+        if match['classes'] == []:
             match['classes'] = None
-            match['elements'] = [instruction]
+
+        if match['ids'] == []:
+            match['ids'] = None
+
+        if match['attributes'] == []:
+            match['attributes'] = None
 
         match['subMatch'] = None
 

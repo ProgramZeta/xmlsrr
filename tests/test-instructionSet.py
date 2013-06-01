@@ -33,21 +33,33 @@ class TestDeterminePattern(unittest.TestCase):
     def test_single_element(self):
         instruction = 'html'
         match = instructionSet.determinePattern(instruction)
-        self.assertEqual(match['elements'][0], instruction)
-        self.assertEqual(match['classes'], None)
-        self.assertEqual(match['subMatch'], None)
+        self.assertEqual(1, len(match['elements']))
+        self.assertEqual('html', match['elements'][0])
+        self.assertEqual(None, match['classes'])
+        self.assertEqual(None, match['subMatch'])
+
+    def test_element_trailing_space(self):
+        instruction = 'html     '
+        match = instructionSet.determinePattern(instruction)
+        self.assertEqual(1, len(match['elements']))
+        self.assertEqual('html', match['elements'][0])
+        self.assertEqual(None, match['classes'])
+        self.assertEqual(None, match['subMatch'])
 
     def test_single_class(self):
         instruction = '.class'
         match = instructionSet.determinePattern(instruction)
-        self.assertEqual(match['classes'][0], 'class')
-        self.assertEqual(match['elements'], None)
+        self.assertEqual(1, len(match['classes']))
+        self.assertEqual('class', match['classes'][0])
+        self.assertEqual(None, match['elements'])
 
     def test_multiple_elements(self):
         instruction = 'html body'
         match = instructionSet.determinePattern(instruction)
-        self.assertEqual(match['elements'][0], 'html')
-        self.assertEqual(match['classes'], None)
+        self.assertEqual(1, len(match['elements']))
+        self.assertEqual('html', match['elements'][0])
+        self.assertEqual(None, match['classes'])
+        self.assertEqual(1, len(match['subMatch']['elements']))
         self.assertEqual(match['subMatch']['elements'][0], 'body')
 
     def test_three_elements(self):
@@ -93,6 +105,63 @@ class TestDeterminePattern(unittest.TestCase):
         match = instructionSet.determinePattern(instruction)
         self.assertEqual('p', match['elements'][0])
         self.assertEqual('blue', match['classes'][0])
+        self.assertEqual(None, match['subMatch'])
+
+    def test_single_id(self):
+        instruction = '#id'
+        match = instructionSet.determinePattern(instruction)
+        self.assertEqual(None, match['elements'])
+        self.assertEqual(None, match['classes'])
+        self.assertEqual(1, len(match['ids']))
+        self.assertEqual('id', match['ids'][0])
+
+    def test_element_with_id(self):
+        instruction = 'p#id'
+        match = instructionSet.determinePattern(instruction)
+        self.assertEqual(1, len(match['elements']))
+        self.assertEqual('p', match['elements'][0])
+        self.assertEqual(None, match['classes'])
+        self.assertEqual(1, len(match['ids']))
+        self.assertEqual('id', match['ids'][0])
+
+    def test_element_with_class_and_id(self):
+        instruction = 'p.class#id'
+        match = instructionSet.determinePattern(instruction)
+        self.assertEqual(1, len(match['elements']))
+        self.assertEqual('p', match['elements'][0])
+        self.assertEqual(1, len(match['classes']))
+        self.assertEqual('class', match['classes'][0])
+        self.assertEqual(1, len(match['ids']))
+        self.assertEqual('id', match['ids'][0])
+
+    def test_element_with_id_and_class(self):
+        instruction = 'p#id.class'
+        match = instructionSet.determinePattern(instruction)
+        self.assertEqual(1, len(match['elements']))
+        self.assertEqual('p', match['elements'][0])
+        self.assertEqual(1, len(match['classes']))
+        self.assertEqual('class', match['classes'][0])
+        self.assertEqual(1, len(match['ids']))
+        self.assertEqual('id', match['ids'][0])
+
+    def test_separate_class_element_id(self):
+        instruction = '.class p #id'
+        match = instructionSet.determinePattern(instruction)
+        self.assertEqual(1, len(match['classes']))
+        self.assertEqual('class', match['classes'][0])
+        self.assertEqual(1, len(match['subMatch']['elements']))
+        self.assertEqual('p', match['subMatch']['elements'][0])
+        self.assertEqual(1, len(match['subMatch']['subMatch']['ids']))
+        self.assertEqual('id', match['subMatch']['subMatch']['ids'][0])
+
+    def test_single_attribute(self):
+        instruction = '[src]'
+        match = instructionSet.determinePattern(instruction)
+        self.assertEqual(None, match['elements'])
+        self.assertEqual(None, match['classes'])
+        self.assertEqual(None, match['ids'])
+        self.assertEqual(1, len(match['attributes']))
+        self.assertIn('src', match['attributes'])
         self.assertEqual(None, match['subMatch'])
 
 
