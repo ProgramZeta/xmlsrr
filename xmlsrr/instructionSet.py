@@ -48,7 +48,6 @@ def determinePattern(instruction):
     match['classes'] = []
     match['ids'] = []
     match['attributes'] = []
-    match['subMatch'] = None
     if len(instruction.split(' ')) > 1:
         match = determinePattern(instruction.split(' ', 1)[0])
         match['subMatch'] = determinePattern(instruction.split(' ', 1)[1])
