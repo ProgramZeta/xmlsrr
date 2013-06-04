@@ -5,27 +5,31 @@ class InstructionSet(object):
 
     def parseInstruction(self, instruction):
         self.mode = determineType(instruction)
+        if self.mode == 'replace':
+            self.match, self.replace = determineReplacement(instruction)
+        elif self.mode == 'remove':
+            self.match = determinePattern(instruction[1:])
+        else:
+            self.match = determinePattern(instruction)
 
 
 def determineType(instruction):
-        remove = False
-        replace = False
+    remove = False
+    replace = False
+    if instruction[0] == '/':
+        remove = True
+    if instruction.find('->') > 0:
+        replace = True
+    if remove and replace:
+        raise ValueError
+    elif remove:
+        mode = 'remove'
+    elif replace:
+        mode = 'replace'
+    else:
+        mode = 'search'
+    return mode
 
-        if instruction[0] == '/':
-            remove = True
-        if instruction.find('->') > 0:
-            replace = True
-
-        if remove and replace:
-            raise ValueError
-        elif remove:
-            mode = 'remove'
-        elif replace:
-            mode= 'replace'
-        else:
-            mode = 'search'
-
-        return mode
 
 def determineReplacement(instruction):
     if len(instruction.split('->')) != 2:
@@ -43,20 +47,16 @@ def determinePattern(instruction):
         raise ValueError("Pattern does not contain any values")
     else:
         instruction = instruction.strip()
-    match = {}
-    match['elements'] = []
-    match['classes'] = []
-    match['ids'] = []
-    match['attributes'] = []
+    match = {'elements': [], 'classes': [], 'ids': [], 'attributes': []}
     if len(instruction.split(' ')) > 1:
         match = determinePattern(instruction.split(' ', 1)[0])
-        match['subMatch'] = determinePattern(instruction.split(' ', 1)[1])
+        match['subMatch'] = InstructionSet(instruction.split(' ', 1)[1])
     else:
         currentType = 'element'
         currentName = ''
         currentAttribute = ''
         for c in instruction:
-            if c in '.#[=]':
+            if c in '.#[=]' and currentType != 'attributeValue':
                 if currentName != '':
                     if currentType == 'element':
                         match['elements'].append(currentName)
@@ -65,30 +65,34 @@ def determinePattern(instruction):
                     elif currentType == 'id':
                         match['ids'].append(currentName)
                     elif currentType == 'attributeName':
-                        match['attributes'] = {currentName : ''}
+                        match['attributes'] = {currentName: ''}
                         currentAttribute = currentName
-                    elif currentType == 'attributeValue':
-                        if currentAttribute != '':
-                            match['attributes'][currentAttribute] = currentName
-                        else:
-                            raise ValueError('Attribute value set before attribute name')
                     currentName = ''
-
-                if c == '.':
-                    currentType = 'class'
-                elif c == '#':
-                    currentType = 'id'
-                elif c == '[':
-                    currentType = 'attributeName'
+                if currentType != 'attributeValue':
+                    if c == '.':
+                        currentType = 'class'
+                    elif c == '#':
+                        currentType = 'id'
+                    elif c == '[':
+                        currentType = 'attributeName'
+                    else:
+                        if currentType == 'attributeName' or currentType == 'attributeValue':
+                            if c == ']':
+                                pass
+                            elif c == '=':
+                                currentType = 'attributeValue'
+            elif currentType == 'attributeValue':
+                if c == ']':
+                    if currentAttribute != '':
+                        match['attributes'][currentAttribute] = currentName
+                        currentName = ''
+                        currentType = 'element'
+                    else:
+                        raise ValueError('Attribute value set before attribute name')
                 else:
-                    if currentType == 'attributeName' or currentType == 'attributeValue':
-                        if c == ']':
-                            pass
-                        elif c == '=':
-                            currentType = 'attributeValue'
+                    currentName = currentName + c
             else:
                 currentName = currentName + c
-
         if currentName != '':
             if currentType == 'element':
                 match['elements'].append(currentName)
@@ -96,26 +100,15 @@ def determinePattern(instruction):
                 match['classes'].append(currentName)
             elif currentType == 'id':
                 match['ids'].append(currentName)
-            elif currentType == 'attributeName':
-                match['attributes'] = {currentName : ''}
-            elif currentType == 'attributeValue':
-                if currentAttribute != '':
-                    match['attributes'][currentAttribute] = currentName
-                else:
-                    raise ValueError('Attribute value set before attribute name')
-
-        if match['elements'] == []:
+            else:
+                raise ValueError("Unable to determine type of last segment")
+        if not match['elements']:
             match['elements'] = None
-
-        if match['classes'] == []:
+        if not match['classes']:
             match['classes'] = None
-
-        if match['ids'] == []:
+        if not match['ids']:
             match['ids'] = None
-
-        if match['attributes'] == []:
+        if not match['attributes']:
             match['attributes'] = None
-
         match['subMatch'] = None
-
     return match
