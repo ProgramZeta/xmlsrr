@@ -2,7 +2,6 @@ import argparse
 import os
 import sys
 import logging
-from lxml import html
 from xmlsrr import instructionSet
 
 
@@ -130,28 +129,7 @@ def validateInstructionsExist(instructionsList):
     return instructions
 
 
-def getListOfFiles(targetFolder):
-    logging.debug("Getting list of files from target folder")
-    fileList = []
-    for root, dirs, files in os.walk(targetFolder):
-        for name in files:
-            if name.find('.htm') > 0:
-                fileList.append(os.path.join(root, name))
-    return fileList
-
-
-def scanFile(fileName, instructions):
-    element = html.parse(fileName).getRoot()
-    for instruction in instructions:
-        matchInstruction(element, instruction)
-
-
 def matchInstruction(element, instruction):
-    elementMatch = False
-    classMatch = False
-    idMatch = False
-    attributeMatch = False
-    matchFound = False
     if instruction.match['elements']:
         if element.tag in instruction.match['elements']:
             elementMatch = True
@@ -196,6 +174,8 @@ def matchInstruction(element, instruction):
 
     if elementMatch and classMatch and idMatch and attributeMatch:
         matchFound = True
+    else:
+        matchFound = False
 
     if not matchFound and len(element) > 0:
         matchFound = matchInstruction(element[0], instruction)
