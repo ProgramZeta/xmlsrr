@@ -123,7 +123,7 @@ def validateInstructionsExist(instructionsList):
     return instructions
 
 
-def matchInstruction(element, instruction):
+def processInstructions(element, instruction):
     if instruction.match['elements']:
         if element.tag in instruction.match['elements']:
             elementMatch = True
@@ -170,9 +170,9 @@ def matchInstruction(element, instruction):
         matchFound = False
 
     if not matchFound and len(element) > 0:
-        matchFound = matchInstruction(element[0], instruction)
+        matchFound = processInstructions(element[0], instruction)
     if matchFound and instruction.match['subMatch']:
-        matchFound = matchInstruction(element, instruction.match['subMatch'])
+        matchFound = processInstructions(element, instruction.match['subMatch'])
     return matchFound
 
 
@@ -197,3 +197,13 @@ if __name__ == '__main__':
     logging.debug("Starting script")
     arguments = argumentParser(sys.argv)
     options = validateOptions(arguments)
+    # Now that we have our options
+    # Parse the instructions
+    # If we're only validating, stop here
+    # We need to get a file list, so we can have an input file and output file list
+    # If input != output, copy everything over to the output folder
+    # Then run the instructions against the output folder
+    # For each instruction in every file:
+    # If it's a search, match any replacements and print them out to console
+    # If it's a remove, find any matches, remove the content, then write the output file
+    # If it's a replace, find any matches, replace the content, then write the output file
