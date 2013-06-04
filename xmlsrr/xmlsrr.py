@@ -132,10 +132,8 @@ def matchInstruction(element, instruction):
     else:
         elementMatch = True
     if instruction.match['classes']:
-        # See if we need to match against classes
         classMatch = True
         for className in instruction.match['classes']:
-            # For each class we need to match
             if classMatch:
                 classMatch = False
                 if element.get('class'):

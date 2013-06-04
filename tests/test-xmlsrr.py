@@ -108,7 +108,8 @@ class TestArgumentParser(unittest.TestCase):
 
 
 class TestValidateOptions(unittest.TestCase):
-    pass
+    def test_no_instruction_file_provided(self):
+        pass
 
 
 class TestParseInstructions(unittest.TestCase):
