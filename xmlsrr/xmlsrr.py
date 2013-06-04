@@ -5,12 +5,6 @@ import logging
 from xmlsrr import instructionSet
 
 
-def main():
-    logging.debug("Starting script")
-    arguments = argumentParser(sys.argv)
-    options = validateOptions(arguments)
-
-
 def argumentParser(arguments):
     logging.debug("Parsing provided arguments")
     if arguments is None or arguments == '':
@@ -202,4 +196,6 @@ def getInstructions():
 
 
 if __name__ == '__main__':
-    main()
+    logging.debug("Starting script")
+    arguments = argumentParser(sys.argv)
+    options = validateOptions(arguments)
