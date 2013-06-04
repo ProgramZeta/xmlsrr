@@ -107,6 +107,22 @@ class TestArgumentParser(unittest.TestCase):
         self.assertTrue(args.verify)
 
 
+class TestValidateOptions(unittest.TestCase):
+    pass
+
+
+class TestParseInstructions(unittest.TestCase):
+    pass
+
+
+class TestValidateInstructionFile(unittest.TestCase):
+    pass
+
+
+class TestValidateVerbosity(unittest.TestCase):
+    pass
+
+
 class TestValidateTarget(unittest.TestCase):
     def test_destination_valid(self):
         def fakeOsAccess(targetFolder, test):
@@ -157,6 +173,14 @@ class TestValidateTarget(unittest.TestCase):
         os.access = fakeOsAccess
         targetFolder = '/tmp/xmlsrr/source'
         self.assertRaises(PermissionError, xmlsrr.validateTarget, [targetFolder], False)
+
+
+class TestValidateOutput(unittest.TestCase):
+    pass
+
+
+class TestValidateLog(unittest.TestCase):
+    pass
 
 
 class TestValidateInstructionsExist(unittest.TestCase):
@@ -318,6 +342,10 @@ class TestMatchInstruction(unittest.TestCase):
         element = html.fromstring(htmlText)
         instruction = instructionSet.InstructionSet(instructions)
         self.assertFalse(xmlsrr.matchInstruction(element, instruction))
+
+
+class TestGetInstructions(unittest.TestCase):
+    pass
 
 
 if __name__ == "__main__":
