@@ -342,7 +342,7 @@ class TestProcessInstructions(unittest.TestCase):
         instructions = 'p.sibling'
         element = html.fromstring(htmlText)
         instruction = instructionSet.InstructionSet(instructions)
-        self.assertFalse(xmlsrr.processInstructions(element, instruction))
+        self.assertTrue(xmlsrr.processInstructions(element, instruction))
 
 
 class TestGetInstructions(unittest.TestCase):

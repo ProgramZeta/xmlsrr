@@ -2,6 +2,9 @@ import argparse
 import os
 import sys
 import logging
+import shutil
+from lxml import html
+from lxml import etree
 from xmlsrr import instructionSet
 
 
@@ -26,6 +29,10 @@ def validateOptions(arguments):
     logging.debug("Validating option settings")
     options = {'verbosity': validateVerbosity(arguments.verbose, arguments.silent),
                'target': validateTarget(arguments.target, arguments.output)}
+    try:
+        options['output'] = validateOutput(arguments.output)
+    except NotADirectoryError:
+        options['output'] = None
     try:
         options['instructionFile'] = validateInstructionFile(arguments.instructions)
     except ValueError:
@@ -123,25 +130,36 @@ def validateInstructionsExist(instructionsList):
     return instructions
 
 
+def matchElement(element, elements):
+    if element.tag in elements:
+        return True
+    else:
+        return False
+
+
+def matchClass(element, classes):
+    classMatch = True
+    for name in classes:
+        if classMatch:
+            classMatch = False
+            if element.get('class'):
+                for eachClass in element.get('class').split(' '):
+                    if eachClass == name:
+                        classMatch = True
+    return classMatch
+
+
 def processInstructions(element, instruction):
     if instruction.match['elements']:
-        if element.tag in instruction.match['elements']:
-            elementMatch = True
-        else:
-            elementMatch = False
+        elementMatch = matchElement(element, instruction.match['elements'])
     else:
         elementMatch = True
+
     if instruction.match['classes']:
-        classMatch = True
-        for className in instruction.match['classes']:
-            if classMatch:
-                classMatch = False
-                if element.get('class'):
-                    for eachClass in element.get('class').split(' '):
-                        if eachClass == className:
-                            classMatch = True
+        classMatch = matchClass(element, instruction.match['classes'])
     else:
         classMatch = True
+
     if instruction.match['ids']:
         if element.get('id') in instruction.match['ids']:
             idMatch = True
@@ -170,10 +188,30 @@ def processInstructions(element, instruction):
         matchFound = False
 
     if not matchFound and len(element) > 0:
-        matchFound = processInstructions(element[0], instruction)
+        for subElement in element:
+            matchFound = processInstructions(subElement, instruction)
     if matchFound and instruction.match['subMatch']:
-        matchFound = processInstructions(element, instruction.match['subMatch'])
-    return matchFound
+        for subElement in element:
+            matchFound = processInstructions(subElement, instruction.match['subMatch'])
+
+    if matchFound:
+        if instruction.mode == 'search':
+            pass
+        elif instruction.mode == 'remove':
+            pass
+        elif instruction.mode == 'replace':
+            pass
+        return True
+    else:
+        return False
+
+
+def removeElement(element, instruction):
+    return element
+
+
+def replaceElement(element, instruction):
+    return element
 
 
 def getInstructions():
@@ -193,17 +231,50 @@ def getInstructions():
     return instructionList
 
 
+def getFileList(targetFolder):
+    fileList = []
+    # For all files in the target folder
+    for root, dirs, files in os.walk(targetFolder):
+        # For each file
+        for name in files:
+            # If the file has '.htm' in the name (covers .htm and .html)
+            if name.find('.htm') >= 0:
+                # Create the full targetFile path
+                targetFile = os.path.join(root, files)
+                # Remove the target directory prefix
+                targetFile = targetFile.split(targetFolder)[1]
+                # Append new file name to our list of files
+                fileList.append(targetFile)
+    return fileList
+
+
 if __name__ == '__main__':
     logging.debug("Starting script")
     arguments = argumentParser(sys.argv)
     options = validateOptions(arguments)
-    # Now that we have our options
-    # Parse the instructions
-    # If we're only validating, stop here
-    # We need to get a file list, so we can have an input file and output file list
-    # If input != output, copy everything over to the output folder
-    # Then run the instructions against the output folder
-    # For each instruction in every file:
-    # If it's a search, match any replacements and print them out to console
-    # If it's a remove, find any matches, remove the content, then write the output file
-    # If it's a replace, find any matches, replace the content, then write the output file
+    if options['instructionFile']:
+        with open(options['instructionFile']) as f:
+            instructions = parseInstructions(f.read())
+    else:
+        instructions = parseInstructions(options['instructionList'])
+    if options['verify'] == True:
+        sys.exit(0)
+    if options['output']:
+        shutil.copytree(options['target'], options['output'])
+        targetFolder = options['output']
+    else:
+        targetFolder = options['target']
+    fileList = getFileList(targetFolder)
+    for name in fileList:
+        element = html.parse(name).getroot()
+        for instruction in instructions:
+            if instruction.mode == 'search':
+                pass
+            elif instruction.mode == 'remove':
+                pass
+            elif instruction.mode == 'replace':
+                pass
+            else:
+                raise ValueError("Invalid instruction mode")
+        with open(name, 'rwb') as f:
+            f.write(etree.tostring(element))
