@@ -149,6 +149,13 @@ def matchClass(element, classes):
     return classMatch
 
 
+def matchId(element, classes):
+    if element.get('id') in instruction.match['ids']:
+        return True
+    else:
+        return False
+
+
 def processInstructions(element, instruction):
     if instruction.match['elements']:
         elementMatch = matchElement(element, instruction.match['elements'])
@@ -161,10 +168,7 @@ def processInstructions(element, instruction):
         classMatch = True
 
     if instruction.match['ids']:
-        if element.get('id') in instruction.match['ids']:
-            idMatch = True
-        else:
-            idMatch = False
+        idMatch = matchId(element, instruction.match['ids'])
     else:
         idMatch = True
 
