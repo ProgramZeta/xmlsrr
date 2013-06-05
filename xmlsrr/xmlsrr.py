@@ -1,3 +1,7 @@
+# coding=utf-8
+"""
+Search, remove, and replace content in a set of XML documents
+"""
 import argparse
 import os
 import sys
@@ -199,20 +203,18 @@ def processInstructions(element, instruction):
     if not matchFound and len(element) > 0:
         for subElement in element:
             matchFound = processInstructions(subElement, instruction)
-    if matchFound and instruction.match['subMatch']:
-        for subElement in element:
-            matchFound = processInstructions(subElement, instruction.match['subMatch'])
-
-    if matchFound:
+    if matchFound and not instruction.match['subMatch']:
         if instruction.mode == 'search':
             pass
         elif instruction.mode == 'remove':
             pass
         elif instruction.mode == 'replace':
             pass
-        return True
-    else:
-        return False
+    if matchFound and instruction.match['subMatch']:
+        for subElement in element:
+            matchFound = processInstructions(subElement, instruction.match['subMatch'])
+
+    return matchFound
 
 
 def removeElement(element, instruction):
@@ -266,7 +268,7 @@ if __name__ == '__main__':
             instructions = parseInstructions(f.read())
     else:
         instructions = parseInstructions(options['instructionList'])
-    if options['verify'] == True:
+    if options['verify']:
         sys.exit(0)
     if options['output']:
         shutil.copytree(options['target'], options['output'])
