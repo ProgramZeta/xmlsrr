@@ -156,6 +156,20 @@ def matchId(element, ids):
         return False
 
 
+def matchAttribute(element, instruction):
+    attributeMatch = True
+    for key, value in instruction.match['attributes'].items():
+        if attributeMatch:
+            attributeMatch = False
+            if value:
+                if element.get(key) == value:
+                    attributeMatch = True
+            else:
+                if element.get(key):
+                    attributeMatch = True
+    return attributeMatch
+
+
 def processInstructions(element, instruction):
     if instruction.match['elements']:
         elementMatch = matchElement(element, instruction.match['elements'])
@@ -173,16 +187,7 @@ def processInstructions(element, instruction):
         idMatch = True
 
     if instruction.match['attributes']:
-        attributeMatch = True
-        for key, value in instruction.match['attributes'].items():
-            if attributeMatch:
-                attributeMatch = False
-                if value:
-                    if element.get(key) == value:
-                        attributeMatch = True
-                else:
-                    if element.get(key):
-                        attributeMatch = True
+        attributeMatch = matchAttribute(element, instruction)
     else:
         attributeMatch = True
 
