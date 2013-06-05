@@ -149,8 +149,8 @@ def matchClass(element, classes):
     return classMatch
 
 
-def matchId(element, classes):
-    if element.get('id') in instruction.match['ids']:
+def matchId(element, ids):
+    if element.get('id') in ids:
         return True
     else:
         return False
