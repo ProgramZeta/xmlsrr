@@ -134,68 +134,55 @@ def validateInstructionsExist(instructionsList):
     return instructions
 
 
-def matchElement(element, elements):
-    if element.tag in elements:
-        return True
-    else:
-        return False
+def matchElement(element, instruction) -> bool:
+    elementMatch = True
+    if instruction.match['elements']:
+        if element.tag not in instruction.match['elements']:
+            elementMatch = False
+    return elementMatch
 
 
-def matchClass(element, classes):
+def matchClass(element, instruction):
     classMatch = True
-    for name in classes:
-        if classMatch:
-            classMatch = False
-            if element.get('class'):
-                for eachClass in element.get('class').split(' '):
-                    if eachClass == name:
-                        classMatch = True
+    if instruction.match['classes']:
+        for name in instruction.match['classes']:
+            if classMatch:
+                classMatch = False
+                if element.get('class'):
+                    for eachClass in element.get('class').split(' '):
+                        if eachClass == name:
+                            classMatch = True
     return classMatch
 
 
-def matchId(element, ids):
-    if element.get('id') in ids:
-        return True
-    else:
-        return False
+def matchId(element, instruction):
+    idMatch = True
+    if instruction.match['ids']:
+        if element.get('id') not in instruction.match['ids']:
+            idMatch = False
+    return idMatch
 
 
-def matchAttribute(element, instruction):
+def matchAttribute(element, instruction) -> bool:
     attributeMatch = True
-    for key, value in instruction.match['attributes'].items():
-        if attributeMatch:
-            attributeMatch = False
-            if value:
-                if element.get(key) == value:
-                    attributeMatch = True
-            else:
-                if element.get(key):
-                    attributeMatch = True
+    if instruction.match['attributes']:
+        for key, value in instruction.match['attributes'].items():
+            if attributeMatch:
+                attributeMatch = False
+                if value:
+                    if element.get(key) == value:
+                        attributeMatch = True
+                else:
+                    if element.get(key):
+                        attributeMatch = True
     return attributeMatch
 
 
 def processInstructions(element, instruction):
-    if instruction.match['elements']:
-        elementMatch = matchElement(element, instruction.match['elements'])
-    else:
-        elementMatch = True
-
-    if instruction.match['classes']:
-        classMatch = matchClass(element, instruction.match['classes'])
-    else:
-        classMatch = True
-
-    if instruction.match['ids']:
-        idMatch = matchId(element, instruction.match['ids'])
-    else:
-        idMatch = True
-
-    if instruction.match['attributes']:
-        attributeMatch = matchAttribute(element, instruction)
-    else:
-        attributeMatch = True
-
-    if elementMatch and classMatch and idMatch and attributeMatch:
+    if matchElement(element, instruction) \
+        and matchClass(element, instruction) \
+        and matchId(element, instruction) \
+        and matchAttribute(element, instruction):
         matchFound = True
     else:
         matchFound = False
