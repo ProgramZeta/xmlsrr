@@ -1,3 +1,4 @@
+# coding=utf-8
 import unittest
 import sys
 from io import StringIO
@@ -265,7 +266,8 @@ class TestProcessInstructions(unittest.TestCase):
         instructions = '[lang]'
         element = html.fromstring(htmlText)
         instruction = instructionSet.InstructionSet(instructions)
-        self.assertTrue(xmlsrr.processInstructions(element, instruction))
+        result, matchFound = xmlsrr.processInstructions(element, instruction)
+        self.assertTrue(matchFound)
 
     def test_attribute_name_no_match(self):
         htmlText = '<html><body><p lang="en-us" id="someName" class="awesome">Some Text</p></body></html>'

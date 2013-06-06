@@ -1,4 +1,9 @@
-class InstructionSet(object):
+# coding=utf-8
+class InstructionSet:
+    """
+    Get an instruction from a given string
+    """
+
     def __init__(self, instruction=None):
         if instruction is not None:
             self.parseInstruction(instruction)

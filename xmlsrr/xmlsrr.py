@@ -142,7 +142,7 @@ def matchElement(element, instruction) -> bool:
     return elementMatch
 
 
-def matchClass(element, instruction):
+def matchClass(element, instruction) -> bool:
     classMatch = True
     if instruction.match['classes']:
         for name in instruction.match['classes']:
@@ -155,7 +155,7 @@ def matchClass(element, instruction):
     return classMatch
 
 
-def matchId(element, instruction):
+def matchId(element, instruction) -> bool:
     idMatch = True
     if instruction.match['ids']:
         if element.get('id') not in instruction.match['ids']:
@@ -189,19 +189,26 @@ def processInstructions(element, instruction):
 
     if not matchFound and len(element) > 0:
         for subElement in element:
-            matchFound = processInstructions(subElement, instruction)
+            (subElement, matchFound) = processInstructions(subElement, instruction)
     if matchFound and not instruction.match['subMatch']:
+        # Output we found a match
         if instruction.mode == 'search':
+            # That's all we have to do for a search
             pass
         elif instruction.mode == 'remove':
-            pass
+            element = None
         elif instruction.mode == 'replace':
-            pass
+            # Replace the element with the new element
+            textContent = element.text
+            element.tag = instruction.replace['elements'][0]
+
     if matchFound and instruction.match['subMatch']:
         for subElement in element:
-            matchFound = processInstructions(subElement, instruction.match['subMatch'])
+            (subElement, matchFound) = processInstructions(subElement, instruction.match['subMatch'])
+            if subElement == None:
+                pass
 
-    return matchFound
+    return element, matchFound
 
 
 def removeElement(element, instruction):
