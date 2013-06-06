@@ -4,6 +4,7 @@ import sys
 from io import StringIO
 import os
 from lxml import html
+from lxml import etree
 from xmlsrr import xmlsrr
 from xmlsrr import instructionSet
 
@@ -362,6 +363,32 @@ class TestProcessInstructions(unittest.TestCase):
         instruction = instructionSet.InstructionSet(instructions)
         result, matchFound = xmlsrr.processInstructions(element, instruction)
         self.assertTrue(matchFound)
+
+    def test_replacement(self):
+        htmlText = '<html><body><p id="someName" class="awesome time">Some Text</p><p class="sibling">sibling text</p></body></html>'
+        instructions = 'p#someName -> p#someOtherName'
+        element = html.fromstring(htmlText)
+        instruction = instructionSet.InstructionSet(instructions)
+        result, matchFound = xmlsrr.processInstructions(element, instruction)
+        self.assertTrue(matchFound)
+
+    def test_replacement_remove_class(self):
+        htmlText = '<html><body><p id="someName" class="awesome time">Some Text</p><p class="sibling">sibling text</p></body></html>'
+        instructions = 'p#someName.awesome -> p#someOtherName'
+        element = html.fromstring(htmlText)
+        instruction = instructionSet.InstructionSet(instructions)
+        result, matchFound = xmlsrr.processInstructions(element, instruction)
+        self.assertTrue(matchFound)
+
+    def test_replacement_replace_class(self):
+        htmlText = '<html><body><p id="someName" class="awesome time">Some Text</p><p class="sibling">sibling text</p></body></html>'
+        resultText = '<html><body><p id="someOtherName" class="blah time">Some Text</p><p class="sibling">sibling text</p></body></html>'
+        instructions = 'p#someName.awesome -> p#someOtherName.blah'
+        element = html.fromstring(htmlText)
+        instruction = instructionSet.InstructionSet(instructions)
+        result, matchFound = xmlsrr.processInstructions(element, instruction)
+        self.assertTrue(matchFound)
+        self.assertEqual(resultText, etree.tostring(result))
 
 
 class TestGetInstructions(unittest.TestCase):
