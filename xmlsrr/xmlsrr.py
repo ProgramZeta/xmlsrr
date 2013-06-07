@@ -9,7 +9,7 @@ import logging
 import shutil
 from lxml import html
 from lxml import etree
-from xmlsrr import instructionSet
+import xmlsrr
 
 
 def argumentParser(arguments):
@@ -50,7 +50,7 @@ def parseInstructions(instructionList):
     logging.debug("Parsing instructions")
     instructions = []
     for instruction in instructionList:
-        instructions.append(instructionSet.InstructionSet(instruction))
+        instructions.append(xmlsrr.instructionSet.InstructionSet(instruction))
     return instructions
 
 
@@ -188,34 +188,23 @@ def processInstructions(element, instruction):
         matchFound = False
 
     if not matchFound and len(element) > 0:
-        for subElement in element:
-            (subElement, matchFound) = processInstructions(subElement, instruction)
+        [processInstructions(elem, instruction) for elem in element]
     if matchFound and not instruction.match['subMatch']:
         # Output we found a match
         if instruction.mode == 'search':
             # That's all we have to do for a search
             pass
         elif instruction.mode == 'remove':
-            element = None
+            element.getparent().remove(element)
         elif instruction.mode == 'replace':
             # Replace the element with the new element
-            textContent = element.text
-            element.tag = instruction.replace['elements'][0]
+            newElement = element
+            newElement.tag = instruction.replace['elements'][0]
+            element.getparent().replace(element, newElement)
 
     if matchFound and instruction.match['subMatch']:
-        for subElement in element:
-            (subElement, matchFound) = processInstructions(subElement, instruction.match['subMatch'])
-            if subElement == None:
-                pass
+        [processInstructions(elem, instruction.match['subMatch']) for elem in element]
 
-    return element, matchFound
-
-
-def removeElement(element, instruction):
-    return element
-
-
-def replaceElement(element, instruction):
     return element
 
 

@@ -220,6 +220,15 @@ class TestValidateInstructionsExist(unittest.TestCase):
 
 
 class TestProcessInstructions(unittest.TestCase):
+    def setUp(self):
+        self.output = StringIO()
+        self.saved_stdout = sys.stdout
+        sys.stdout = self.output
+
+    def tearDown(self):
+        self.output.close()
+        sys.stdout = self.saved_stdout
+
     def test_element_no_match(self):
         htmlText = '<html><body><p class="awesome">Some Text</p></body></html>'
         instructions = 'div'
@@ -324,6 +333,14 @@ class TestProcessInstructions(unittest.TestCase):
         result, matchFound = xmlsrr.processInstructions(element, instruction)
         self.assertTrue(matchFound)
 
+    def test_match_element_id(self):
+        htmlText = '<html><body><p id="someName" class="awesome time">Some Text</p></body></html>'
+        instructions = 'p#someName'
+        element = html.fromstring(htmlText)
+        instruction = instructionSet.InstructionSet(instructions)
+        result, matchFound = xmlsrr.processInstructions(element, instruction)
+        self.assertTrue(matchFound)
+
     def test_match_element_class_no_match(self):
         htmlText = '<html><body><p id="someName" class="awesome time">Some Text</p></body></html>'
         instructions = 'p.non'
@@ -372,13 +389,23 @@ class TestProcessInstructions(unittest.TestCase):
         result, matchFound = xmlsrr.processInstructions(element, instruction)
         self.assertTrue(matchFound)
 
+
+    def test_replacement_element(self):
+        htmlText = '<html><body><p id="someName" class="awesome time">Some Text</p><p class="sibling">sibling text</p></body></html>'
+        resultText = b'<html><body><div id="someName" class="awesome time">Some Text</div><div class="sibling">sibling text</div></body></html>'
+        instructions = 'p -> div'
+        element = html.fromstring(htmlText)
+        instruction = instructionSet.InstructionSet(instructions)
+        result = xmlsrr.processInstructions(element, instruction)
+        self.assertEqual(resultText, html.tostring(result))
+
     def test_replacement_remove_class(self):
         htmlText = '<html><body><p id="someName" class="awesome time">Some Text</p><p class="sibling">sibling text</p></body></html>'
         instructions = 'p#someName.awesome -> p#someOtherName'
         element = html.fromstring(htmlText)
         instruction = instructionSet.InstructionSet(instructions)
-        result, matchFound = xmlsrr.processInstructions(element, instruction)
-        self.assertTrue(matchFound)
+        result = xmlsrr.processInstructions(element, instruction)
+
 
     def test_replacement_replace_class(self):
         htmlText = '<html><body><p id="someName" class="awesome time">Some Text</p><p class="sibling">sibling text</p></body></html>'
