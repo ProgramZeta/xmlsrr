@@ -1,4 +1,7 @@
 # coding=utf-8
+import logging
+
+
 class InstructionSet:
     """
     Get an instruction from a given string
@@ -49,7 +52,8 @@ def determineReplacement(instruction):
 
 def determinePattern(instruction):
     if instruction.strip() == '':
-        raise ValueError("Pattern does not contain any values")
+        logging.error("Pattern does not contain any values: {0}".format(instruction))
+        raise ValueError
     else:
         instruction = instruction.strip()
     match = {'elements': [], 'classes': [], 'ids': [], 'attributes': []}
