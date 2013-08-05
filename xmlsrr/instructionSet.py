@@ -56,68 +56,74 @@ def determinePattern(instruction):
         raise ValueError
     else:
         instruction = instruction.strip()
-    match = {'elements': [], 'classes': [], 'ids': [], 'attributes': []}
-    if len(instruction.split(' ')) > 1:
-        match = determinePattern(instruction.split(' ', 1)[0])
-        match['subMatch'] = InstructionSet(instruction.split(' ', 1)[1])
-    else:
-        currentType = 'element'
-        currentName = ''
-        currentAttribute = ''
-        for c in instruction:
-            if c in '.#[=]' and currentType != 'attributeValue':
-                if currentName != '':
-                    if currentType == 'element':
-                        match['elements'].append(currentName)
-                    elif currentType == 'class':
-                        match['classes'].append(currentName)
-                    elif currentType == 'id':
-                        match['ids'].append(currentName)
-                    elif currentType == 'attributeName':
-                        match['attributes'] = {currentName: ''}
-                        currentAttribute = currentName
-                    currentName = ''
-                if currentType != 'attributeValue':
-                    if c == '.':
-                        currentType = 'class'
-                    elif c == '#':
-                        currentType = 'id'
-                    elif c == '[':
-                        currentType = 'attributeName'
-                    else:
-                        if currentType == 'attributeName' or currentType == 'attributeValue':
-                            if c == ']':
-                                pass
-                            elif c == '=':
-                                currentType = 'attributeValue'
-            elif currentType == 'attributeValue':
-                if c == ']':
-                    if currentAttribute != '':
-                        match['attributes'][currentAttribute] = currentName
-                        currentName = ''
-                        currentType = 'element'
-                    else:
-                        raise ValueError('Attribute value set before attribute name')
-                else:
-                    currentName = currentName + c
+    match = {'elements': [], 'classes': [], 'ids': [], 'attributes': [], 'subMatch': None}
+    currentType = 'element'
+    currentAttribute = ''
+    nextType = ''
+    charCount = 0
+    currentValue = ''
+    for c in instruction:
+        charCount += 1
+        if currentType == 'attributeName':
+            if c == '=':
+                nextType = 'attributeValue'
+            elif c == ']':
+                nextType = 'element'
             else:
-                currentName = currentName + c
-        if currentName != '':
-            if currentType == 'element':
-                match['elements'].append(currentName)
-            elif currentType == 'class':
-                match['classes'].append(currentName)
-            elif currentType == 'id':
-                match['ids'].append(currentName)
+                currentValue += c
+        elif currentType == 'attributeValue':
+            if c == ']':
+                nextType = 'element'
             else:
-                raise ValueError("Unable to determine type of last segment")
-        if not match['elements']:
-            match['elements'] = None
-        if not match['classes']:
-            match['classes'] = None
-        if not match['ids']:
-            match['ids'] = None
-        if not match['attributes']:
-            match['attributes'] = None
-        match['subMatch'] = None
+                currentValue += c
+        else:
+            if c == '.':
+                nextType = 'class'
+            elif c == '#':
+                nextType = 'id'
+            elif c == '[':
+                nextType = 'attributeName'
+            elif c == ' ':
+                nextType = 'subMatch'
+            else:
+                currentValue += c
+
+        if nextType != '':
+            if currentValue != '':
+                if currentType == 'element':
+                    match['elements'].append(currentValue)
+                if currentType == 'class':
+                    match['classes'].append(currentValue)
+                if currentType == 'id':
+                    match['ids'].append(currentValue)
+                if currentType == 'attributeName':
+                    match['attributes'] = {currentValue: ''}
+                    currentAttribute = currentValue
+                if currentType == 'attributeValue':
+                    match['attributes'][currentAttribute] = currentValue
+                    currentAttribute = ''
+                currentValue = ''
+            if nextType == 'subMatch':
+                match['subMatch'] = InstructionSet(instruction[charCount:])
+                break
+            else:
+                currentType = nextType
+                currentValue = ''
+                nextType = ''
+
+    if currentValue != '':
+        if currentType == 'element':
+            match['elements'].append(currentValue)
+        if currentType == 'class':
+            match['classes'].append(currentValue)
+        if currentType == 'id':
+            match['ids'].append(currentValue)
+
+
+    if match['elements'] == []:
+        match['elements'] = None
+    if match['classes'] == []:
+        match['classes'] = None
+    if match['ids'] == []:
+        match['ids'] = None
     return match

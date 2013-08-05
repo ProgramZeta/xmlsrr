@@ -75,6 +75,7 @@ class TestDeterminePattern(unittest.TestCase):
     def test_multiple_elements(self):
         instruction = 'html body'
         match = instructionSet.determinePattern(instruction)
+        print(match['elements'])
         self.assertEqual(1, len(match['elements']))
         self.assertEqual('html', match['elements'][0])
         self.assertEqual(None, match['classes'])
@@ -84,6 +85,7 @@ class TestDeterminePattern(unittest.TestCase):
     def test_three_elements(self):
         instruction = 'html body div'
         match = instructionSet.determinePattern(instruction)
+        self.assertEqual(len(match['elements']), 1)
         self.assertEqual(match['elements'][0], 'html')
         self.assertEqual(match['classes'], None)
         self.assertEqual(len(match['subMatch'].match['elements']), 1)
@@ -122,7 +124,9 @@ class TestDeterminePattern(unittest.TestCase):
     def test_element_with_class(self):
         instruction = 'p.blue'
         match = instructionSet.determinePattern(instruction)
+        self.assertEqual(len(match['elements']), 1)
         self.assertEqual('p', match['elements'][0])
+        self.assertEqual(len(match['classes']), 1)
         self.assertEqual('blue', match['classes'][0])
         self.assertEqual(None, match['subMatch'])
 
@@ -166,6 +170,7 @@ class TestDeterminePattern(unittest.TestCase):
     def test_separate_class_element_id(self):
         instruction = '.class p #id'
         match = instructionSet.determinePattern(instruction)
+        print(match['classes'])
         self.assertEqual(1, len(match['classes']))
         self.assertEqual('class', match['classes'][0])
         self.assertEqual(1, len(match['subMatch'].match['elements']))
@@ -213,6 +218,27 @@ class TestDeterminePattern(unittest.TestCase):
         instruction = '[aaa=a'
         self.assertRaises(ValueError, instructionSet.determinePattern, instruction)
 
+    def test_attribute_value_has_spaces(self):
+        instruction = '[style=font-weight: bold;]'
+        match = instructionSet.determinePattern(instruction)
+        self.assertEqual(None, match['elements'])
+        self.assertEqual(None, match['classes'])
+        self.assertEqual(None, match['ids'])
+        self.assertEqual(1, len(match['attributes']))
+        self.assertIn('style', match['attributes'])
+        self.assertEqual('font-weight: bold;', match['attributes']['style'])
+        self.assertEqual(None, match['subMatch'])
+
+    def test_attribute_value_has_multiple_spaces(self):
+        instruction = '[style=text-indent:0px; margin-left: 23px;list-style-position:outside;]'
+        match = instructionSet.determinePattern(instruction)
+        self.assertEqual(None, match['elements'])
+        self.assertEqual(None, match['classes'])
+        self.assertEqual(None, match['ids'])
+        self.assertEqual(1, len(match['attributes']))
+        self.assertIn('style', match['attributes'])
+        self.assertEqual('text-indent:0px; margin-left: 23px;list-style-position:outside;', match['attributes']['style'])
+        self.assertEqual(None, match['subMatch'])
 
 class TestDetermineReplacement(unittest.TestCase):
     def test_single_replace(self):
