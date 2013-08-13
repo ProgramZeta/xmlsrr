@@ -103,6 +103,9 @@ def determinePattern(instruction):
                     match['attributes'][currentAttribute] = currentValue
                     currentAttribute = ''
                 currentValue = ''
+            else:
+                if currentType == 'attributeName':
+                    raise ValueError
             if nextType == 'subMatch':
                 match['subMatch'] = InstructionSet(instruction[charCount:])
                 break
@@ -118,7 +121,6 @@ def determinePattern(instruction):
             match['classes'].append(currentValue)
         if currentType == 'id':
             match['ids'].append(currentValue)
-
 
     if match['elements'] == []:
         match['elements'] = None

@@ -75,7 +75,6 @@ class TestDeterminePattern(unittest.TestCase):
     def test_multiple_elements(self):
         instruction = 'html body'
         match = instructionSet.determinePattern(instruction)
-        print(match['elements'])
         self.assertEqual(1, len(match['elements']))
         self.assertEqual('html', match['elements'][0])
         self.assertEqual(None, match['classes'])
@@ -170,7 +169,6 @@ class TestDeterminePattern(unittest.TestCase):
     def test_separate_class_element_id(self):
         instruction = '.class p #id'
         match = instructionSet.determinePattern(instruction)
-        print(match['classes'])
         self.assertEqual(1, len(match['classes']))
         self.assertEqual('class', match['classes'][0])
         self.assertEqual(1, len(match['subMatch'].match['elements']))
@@ -214,10 +212,6 @@ class TestDeterminePattern(unittest.TestCase):
         instruction = '[=aaa]'
         self.assertRaises(ValueError, instructionSet.determinePattern, instruction)
 
-    def test_attribute_started_but_not_finished(self):
-        instruction = '[aaa=a'
-        self.assertRaises(ValueError, instructionSet.determinePattern, instruction)
-
     def test_attribute_value_has_spaces(self):
         instruction = '[style=font-weight: bold;]'
         match = instructionSet.determinePattern(instruction)
@@ -237,8 +231,10 @@ class TestDeterminePattern(unittest.TestCase):
         self.assertEqual(None, match['ids'])
         self.assertEqual(1, len(match['attributes']))
         self.assertIn('style', match['attributes'])
-        self.assertEqual('text-indent:0px; margin-left: 23px;list-style-position:outside;', match['attributes']['style'])
+        self.assertEqual('text-indent:0px; margin-left: 23px;list-style-position:outside;',
+                         match['attributes']['style'])
         self.assertEqual(None, match['subMatch'])
+
 
 class TestDetermineReplacement(unittest.TestCase):
     def test_single_replace(self):

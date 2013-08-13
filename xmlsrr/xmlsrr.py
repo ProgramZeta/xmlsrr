@@ -201,13 +201,13 @@ def processInstructions(element, instruction):
         elif instruction.mode == 'replace':
             # Replace the element with the new element
             newElement = element
-            if instruction.match['elements']:
+            if instruction.match['elements'] or instruction.replace['elements']:
                 newElement.tag = instruction.replace['elements'][0]
-            if instruction.match['classes']:
+            if instruction.match['classes'] or instruction.replace['classes']:
                 newElement.set('class', replaceClasses(newElement.get('class'), instruction))
-            if instruction.match['ids']:
+            if instruction.match['ids'] or instruction.replace['ids']:
                 newElement.set('id', instruction.replace['ids'][0])
-            if instruction.match['attributes']:
+            if instruction.match['attributes'] or instruction.replace['attributes']:
                 for key, value in instruction.match['attributes'].items():
                     if element.get(key):
                         if value == '' or (value != '' and element.attrib[key] == value):

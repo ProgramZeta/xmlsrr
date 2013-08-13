@@ -5,25 +5,8 @@ from io import StringIO
 import os
 from lxml import html
 from lxml import etree
-from xmlsrr import xmlsrr
-from xmlsrr import instructionSet
-
-
-class TestValidateOptions(unittest.TestCase):
-    def test_no_instruction_file_provided(self):
-        pass
-
-
-class TestParseInstructions(unittest.TestCase):
-    pass
-
-
-class TestValidateInstructionFile(unittest.TestCase):
-    pass
-
-
-class TestValidateVerbosity(unittest.TestCase):
-    pass
+import xmlsrr
+import instructionSet
 
 
 class TestValidateTarget(unittest.TestCase):
@@ -78,14 +61,6 @@ class TestValidateTarget(unittest.TestCase):
         self.assertRaises(PermissionError, xmlsrr.validateTarget, [targetFolder], False)
 
 
-class TestValidateOutput(unittest.TestCase):
-    pass
-
-
-class TestValidateLog(unittest.TestCase):
-    pass
-
-
 class TestValidateInstructionsExist(unittest.TestCase):
     def test_empty_instruction_list(self):
         instructionsList = []
@@ -129,168 +104,53 @@ class TestProcessInstructions(unittest.TestCase):
         self.output.close()
         sys.stdout = self.saved_stdout
 
-    def test_element_no_match(self):
-        htmlText = '<html><body><p class="awesome">Some Text</p></body></html>'
-        instructions = 'div'
+    def test_no_changes(self):
+        htmlText = '<html><body><p id="someName" class="awesome time">Some Text</p><p class="sibling">sibling <em>text</em></p></body></html>'
+        resultText = b'<html><body><p id="someName" class="awesome time">Some Text</p><p class="sibling">sibling <em>text</em></p></body></html>'
+        instructions = '/div'
         element = html.fromstring(htmlText)
         instruction = instructionSet.InstructionSet(instructions)
-        result, matchFound = xmlsrr.processInstructions(element, instruction)
-        self.assertFalse(matchFound)
+        result = xmlsrr.processInstructions(element, instruction)
+        self.assertEqual(resultText, etree.tostring(result))
 
-    def test_element_match(self):
-        htmlText = '<html><body><p class="awesome">Some Text</p></body></html>'
-        instructions = 'p'
+    def test_remove_element(self):
+        htmlText = '<html><body><p id="someName" class="awesome time">Some Text</p><p class="sibling">sibling <em>text</em></p></body></html>'
+        resultText = b'<html><body><p id="someName" class="awesome time">Some Text</p><p class="sibling">sibling </p></body></html>'
+        instructions = '/em'
         element = html.fromstring(htmlText)
         instruction = instructionSet.InstructionSet(instructions)
-        result, matchFound = xmlsrr.processInstructions(element, instruction)
-        self.assertTrue(matchFound)
+        result = xmlsrr.processInstructions(element, instruction)
+        self.assertEqual(resultText, etree.tostring(result))
 
-    def test_class_no_match(self):
-        htmlText = '<html><body><p class="awesome">Some Text</p></body></html>'
-        instructions = '.non'
+    def test_remove_class(self):
+        htmlText = '<html><body><p id="someName" class="awesome time">Some Text</p><p class="sibling">sibling <em>text</em></p></body></html>'
+        resultText = b'<html><body><p class="sibling">sibling <em>text</em></p></body></html>'
+        instructions = '/.awesome'
         element = html.fromstring(htmlText)
         instruction = instructionSet.InstructionSet(instructions)
-        result, matchFound = xmlsrr.processInstructions(element, instruction)
-        self.assertFalse(matchFound)
+        result = xmlsrr.processInstructions(element, instruction)
+        self.assertEqual(resultText, etree.tostring(result))
 
-    def test_class_match(self):
-        htmlText = '<html><body><p class="awesome">Some Text</p></body></html>'
-        instructions = '.awesome'
+    def test_remove_id(self):
+        htmlText = '<html><body><p id="someName" class="awesome time">Some Text</p><p class="sibling">sibling <em>text</em></p></body></html>'
+        resultText = b'<html><body><p class="sibling">sibling <em>text</em></p></body></html>'
+        instructions = '/#someName'
         element = html.fromstring(htmlText)
         instruction = instructionSet.InstructionSet(instructions)
-        result, matchFound = xmlsrr.processInstructions(element, instruction)
-        self.assertTrue(matchFound)
+        result = xmlsrr.processInstructions(element, instruction)
+        self.assertEqual(resultText, etree.tostring(result))
 
-    def test_id_no_match(self):
-        htmlText = '<html><body><p id="someName" class="awesome">Some Text</p></body></html>'
-        instructions = '#non'
+    def test_remove_attribute_add_class(self):
+        htmlText = '<html><body><p id="someName" style="text-indent:0px; margin-left: 26px;list-style-position:outside;" class="awesome time">Some Text</p><p class="sibling">sibling <em>text</em></p></body></html>'
+        resultText = b'<html><body><p id="someName" class="awesome time listIndent1">Some Text</p><p class="sibling">sibling <em>text</em></p></body></html>'
+        instructions = '[style=text-indent:0px; margin-left: 26px;list-style-position:outside;] -> .listIndent1'
         element = html.fromstring(htmlText)
         instruction = instructionSet.InstructionSet(instructions)
-        result, matchFound = xmlsrr.processInstructions(element, instruction)
-        self.assertFalse(matchFound)
-
-    def test_id_match(self):
-        htmlText = '<html><body><p id="someName" class="awesome">Some Text</p></body></html>'
-        instructions = '#someName'
-        element = html.fromstring(htmlText)
-        instruction = instructionSet.InstructionSet(instructions)
-        result, matchFound = xmlsrr.processInstructions(element, instruction)
-        self.assertTrue(matchFound)
-
-    def test_attribute_name_match(self):
-        htmlText = '<html><body><p lang="en-us" id="someName" class="awesome">Some Text</p></body></html>'
-        instructions = '[lang]'
-        element = html.fromstring(htmlText)
-        instruction = instructionSet.InstructionSet(instructions)
-        result, matchFound = xmlsrr.processInstructions(element, instruction)
-        self.assertTrue(matchFound)
-
-    def test_attribute_name_no_match(self):
-        htmlText = '<html><body><p lang="en-us" id="someName" class="awesome">Some Text</p></body></html>'
-        instructions = '[nolang]'
-        element = html.fromstring(htmlText)
-        instruction = instructionSet.InstructionSet(instructions)
-        result, matchFound = xmlsrr.processInstructions(element, instruction)
-        self.assertFalse(matchFound)
-
-    def test_attribute_value_match(self):
-        htmlText = '<html><body><p lang="en-us" id="someName" class="awesome">Some Text</p></body></html>'
-        instructions = '[lang=en-us]'
-        element = html.fromstring(htmlText)
-        instruction = instructionSet.InstructionSet(instructions)
-        result, matchFound = xmlsrr.processInstructions(element, instruction)
-        self.assertTrue(matchFound)
-
-    def test_attribute_value_no_match(self):
-        htmlText = '<html><body><p lang="en-us" id="someName" class="awesome">Some Text</p></body></html>'
-        instructions = '[lang=de-de]'
-        element = html.fromstring(htmlText)
-        instruction = instructionSet.InstructionSet(instructions)
-        result, matchFound = xmlsrr.processInstructions(element, instruction)
-        self.assertFalse(matchFound)
-
-    def test_match_multiple_classes_match_all(self):
-        htmlText = '<html><body><p id="someName" class="awesome time">Some Text</p></body></html>'
-        instructions = '.awesome.time'
-        element = html.fromstring(htmlText)
-        instruction = instructionSet.InstructionSet(instructions)
-        result, matchFound = xmlsrr.processInstructions(element, instruction)
-        self.assertTrue(matchFound)
-
-    def test_match_multiple_classes_match_one(self):
-        htmlText = '<html><body><p id="someName" class="awesome time">Some Text</p></body></html>'
-        instructions = '.awesome'
-        element = html.fromstring(htmlText)
-        instruction = instructionSet.InstructionSet(instructions)
-        result, matchFound = xmlsrr.processInstructions(element, instruction)
-        self.assertTrue(matchFound)
-
-    def test_match_element_class(self):
-        htmlText = '<html><body><p id="someName" class="awesome time">Some Text</p></body></html>'
-        instructions = 'p.awesome'
-        element = html.fromstring(htmlText)
-        instruction = instructionSet.InstructionSet(instructions)
-        result, matchFound = xmlsrr.processInstructions(element, instruction)
-        self.assertTrue(matchFound)
-
-    def test_match_element_id(self):
-        htmlText = '<html><body><p id="someName" class="awesome time">Some Text</p></body></html>'
-        instructions = 'p#someName'
-        element = html.fromstring(htmlText)
-        instruction = instructionSet.InstructionSet(instructions)
-        result, matchFound = xmlsrr.processInstructions(element, instruction)
-        self.assertTrue(matchFound)
-
-    def test_match_element_class_no_match(self):
-        htmlText = '<html><body><p id="someName" class="awesome time">Some Text</p></body></html>'
-        instructions = 'p.non'
-        element = html.fromstring(htmlText)
-        instruction = instructionSet.InstructionSet(instructions)
-        result, matchFound = xmlsrr.processInstructions(element, instruction)
-        self.assertFalse(matchFound)
-
-    def test_match_element_id_match(self):
-        htmlText = '<html><body><p id="someName" class="awesome time">Some Text</p></body></html>'
-        instructions = 'p.non'
-        element = html.fromstring(htmlText)
-        instruction = instructionSet.InstructionSet(instructions)
-        result, matchFound = xmlsrr.processInstructions(element, instruction)
-        self.assertFalse(matchFound)
-
-    def test_complex_match(self):
-        htmlText = '<html><body><p id="someName" class="awesome time">Some Text</p></body></html>'
-        instructions = 'body .awesome'
-        element = html.fromstring(htmlText)
-        instruction = instructionSet.InstructionSet(instructions)
-        result, matchFound = xmlsrr.processInstructions(element, instruction)
-        self.assertTrue(matchFound)
-
-    def test_complex_no_match(self):
-        htmlText = '<html><body><p id="someName" class="awesome time">Some Text</p></body></html>'
-        instructions = 'body .non'
-        element = html.fromstring(htmlText)
-        instruction = instructionSet.InstructionSet(instructions)
-        result, matchFound = xmlsrr.processInstructions(element, instruction)
-        self.assertFalse(matchFound)
-
-    def test_sibling_match(self):
-        htmlText = '<html><body><p id="someName" class="awesome time">Some Text</p><p class="sibling">sibling text</p></body></html>'
-        instructions = 'p.sibling'
-        element = html.fromstring(htmlText)
-        instruction = instructionSet.InstructionSet(instructions)
-        result, matchFound = xmlsrr.processInstructions(element, instruction)
-        self.assertTrue(matchFound)
-
-    def test_replacement(self):
-        htmlText = '<html><body><p id="someName" class="awesome time">Some Text</p><p class="sibling">sibling text</p></body></html>'
-        instructions = 'p#someName -> p#someOtherName'
-        element = html.fromstring(htmlText)
-        instruction = instructionSet.InstructionSet(instructions)
-        result, matchFound = xmlsrr.processInstructions(element, instruction)
-        self.assertTrue(matchFound)
+        result = xmlsrr.processInstructions(element, instruction)
+        self.assertEqual(resultText, etree.tostring(result))
 
 
-    def test_replacement_element(self):
+    def test_replace_element(self):
         htmlText = '<html><body><p id="someName" class="awesome time">Some Text</p><p class="sibling">sibling text</p></body></html>'
         resultText = b'<html><body><div id="someName" class="awesome time">Some Text</div><div class="sibling">sibling text</div></body></html>'
         instructions = 'p -> div'
@@ -299,7 +159,7 @@ class TestProcessInstructions(unittest.TestCase):
         result = xmlsrr.processInstructions(element, instruction)
         self.assertEqual(resultText, etree.tostring(result))
 
-    def test_replacement_remove_class(self):
+    def test_replace_id_remove_class(self):
         htmlText = '<html><body><p id="someName" class="awesome time">Some Text</p><p class="sibling">sibling text</p></body></html>'
         resultText = b'<html><body><p id="someOtherName" class="time">Some Text</p><p class="sibling">sibling text</p></body></html>'
         instructions = 'p#someName.awesome -> p#someOtherName'
@@ -309,7 +169,7 @@ class TestProcessInstructions(unittest.TestCase):
         self.assertEqual(resultText, etree.tostring(result))
 
 
-    def test_replacement_replace_class(self):
+    def test_replace_id_and_class(self):
         htmlText = '<html><body><p id="someName" class="awesome time">Some Text</p><p class="sibling">sibling text</p></body></html>'
         resultText = b'<html><body><p id="someOtherName" class="time blah">Some Text</p><p class="sibling">sibling text</p></body></html>'
         instructions = 'p#someName.awesome -> p#someOtherName.blah'
@@ -317,10 +177,6 @@ class TestProcessInstructions(unittest.TestCase):
         instruction = instructionSet.InstructionSet(instructions)
         result = xmlsrr.processInstructions(element, instruction)
         self.assertEqual(resultText, etree.tostring(result))
-
-
-class TestGetInstructions(unittest.TestCase):
-    pass
 
 
 if __name__ == "__main__":
